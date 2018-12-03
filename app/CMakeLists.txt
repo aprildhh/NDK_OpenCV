@@ -13,14 +13,17 @@ cmake_minimum_required(VERSION 3.4.1)
 #该变量为真时，会创建完整版本的Makefile
 set(CMAKE_VERBOSE_MAKEFILE on)
 
-#定义变量ocvlibs 使后面的命令可以使用，定位具体的库文件====去目录下读取动态库
+#定义变量ocvlibs使后面的命令可以使用定位具体的库文件
 set(ocvlibs "D:/Java/install/opencv-3.4.4-android-sdk/OpenCV-android-sdk/sdk/native/libs")
 
-# 调用头文件的具体路径
-include_directories('D:/Java/install/opencv-3.4.4-android-sdk/OpenCV-android-sdk/sdk/native/jni/include')
+#调用头文件的具体路径
+include_directories(D:/Java/install/opencv-3.4.4-android-sdk/OpenCV-android-sdk/sdk/native/jni/include)
 
-add_library(libopencv_java3 SHARED IMPORTED)
-set_target_properties(libopencv_java3 PROPERTIES IMPORTED_LOCATION "${ocvlibs}/${ANDROID_ABI}/libopencv_java3.so")
+add_library(libopencv_java3 SHARED IMPORTED )
+
+set_target_properties(libopencv_java3 PROPERTIES
+                      IMPORTED_LOCATION
+						"${ocvlibs}/${ANDROID_ABI}/libopencv_java3.so")
 
 add_library( # Sets the name of the library.
              native-lib

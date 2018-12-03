@@ -17,18 +17,24 @@ android {
             }
         }
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+
     sourceSets{
         main{
             // 这个目录下的库文件会被调用，并且一同打包进我们的apk中
             jniLibs.srcDirs = ['D:/Java/install/opencv-3.4.4-android-sdk/OpenCV-android-sdk/sdk/native/libs'];
         }
     }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug{
+            jniDebuggable
+        }
+    }
+
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
