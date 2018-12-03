@@ -34,32 +34,32 @@ Java_com_dhh_ndk_1opencv_MainActivity_grayP(JNIEnv *env, jclass type, jintArray 
      */
     Mat imgData(h, w, CV_8UC4, (unsigned char *) pixels);
 
-    /**
-     * 指针方式--操作像素
-     */
-    uchar *ptr = imgData.ptr(0);
-
-    //获取当前的CPU钟摆时间
-    double time = static_cast<double >(getTickCount());
-
-    //中间是运行过程
-    for (int i = 0; i < w * h; ++i) {
-        /**
-         * 灰度值计算公式  像素灰度值 = R*0.3+ G*0.59 + B*0.11
-         * 从RGB转Y（亮度）UV得出来的
-         * 矩阵的第一行就是一个灰度值
-         */
-        uchar gray = (uchar) (ptr[4 * i + 2] * 0.299 + ptr[4 * i + 1] * 0.587 +
-                              ptr[4 * i + 0] * 0.114);
-        ptr[4 * i + 0] = gray;
-        ptr[4 * i + 1] = gray;
-        ptr[4 * i + 2] = gray;
-
-    }
-
-    //计算运行时间
-    time = ((double) getTickCount() - time) / getTickFrequency();
-    __android_log_print(ANDROID_LOG_ERROR,"指针方式--操作像素所用时长","%lf",time);//0.102784
+//    /**
+//     * 指针方式--操作像素
+//     */
+//    uchar *ptr = imgData.ptr(0);
+//
+//    //获取当前的CPU钟摆时间
+//    double time = static_cast<double >(getTickCount());
+//
+//    //中间是运行过程
+//    for (int i = 0; i < w * h; ++i) {
+//        /**
+//         * 灰度值计算公式  像素灰度值 = R*0.3+ G*0.59 + B*0.11
+//         * 从RGB转Y（亮度）UV得出来的
+//         * 矩阵的第一行就是一个灰度值
+//         */
+//        uchar gray = (uchar) (ptr[4 * i + 2] * 0.299 + ptr[4 * i + 1] * 0.587 +
+//                              ptr[4 * i + 0] * 0.114);
+//        ptr[4 * i + 0] = gray;
+//        ptr[4 * i + 1] = gray;
+//        ptr[4 * i + 2] = gray;
+//
+//    }
+//
+//    //计算运行时间
+//    time = ((double) getTickCount() - time) / getTickFrequency();
+//    __android_log_print(ANDROID_LOG_ERROR,"指针方式--操作像素所用时长","%lf",time);//0.102784
 
 
 //    /**
@@ -86,26 +86,26 @@ Java_com_dhh_ndk_1opencv_MainActivity_grayP(JNIEnv *env, jclass type, jintArray 
 //    __android_log_print(ANDROID_LOG_ERROR, "迭代器--操作像素所用时长", "%lf", time);//0.581317
 
 
-//    /**
-//     * 动态地址计算--操作像素
-//     */
-//    //获取图片的行列数
-//    int row = imgData.rows;
-//    int col = imgData.cols;
-//    double time = static_cast<double >(getTickCount());
-//    for (int i = 0; i < row; ++i) {
-//        for (int j = 0; j < col; ++j) {
-//            uchar gray = imgData.at<Vec4b>(i, j)[2] * 0.299 + imgData.at<Vec4b>(i, j)[1] * 0.587 +
-//                         imgData.at<Vec4b>(i, j)[0] * 0.114;
-//            imgData.at<Vec4b>(i, j)[0] = gray;
-//            imgData.at<Vec4b>(i, j)[1] = gray;
-//            imgData.at<Vec4b>(i, j)[2] = gray;
-//        }
-//    }
-//
-//    //计算运行时间
-//    time = ((double) getTickCount() - time) / getTickFrequency();
-//    __android_log_print(ANDROID_LOG_ERROR, "动态地址计算--操作像素所用时长：", "%lf", time);//0.609992
+    /**
+     * 动态地址计算--操作像素
+     */
+    //获取图片的行列数
+    int row = imgData.rows;
+    int col = imgData.cols;
+    double time = static_cast<double >(getTickCount());
+    for (int i = 0; i < row; ++i) {
+        for (int j = 0; j < col; ++j) {
+            uchar gray = imgData.at<Vec4b>(i, j)[2] * 0.299 + imgData.at<Vec4b>(i, j)[1] * 0.587 +
+                         imgData.at<Vec4b>(i, j)[0] * 0.114;
+            imgData.at<Vec4b>(i, j)[0] = gray;
+            imgData.at<Vec4b>(i, j)[1] = gray;
+            imgData.at<Vec4b>(i, j)[2] = gray;
+        }
+    }
+
+    //计算运行时间
+    time = ((double) getTickCount() - time) / getTickFrequency();
+    __android_log_print(ANDROID_LOG_ERROR, "动态地址计算--操作像素所用时长：", "%lf", time);//0.609992
 
     //腐蚀效果
 //    Mat ppt = getStructuringElement(MORPH_RECT,Size(50,50));
