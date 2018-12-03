@@ -110,46 +110,70 @@ Java_com_dhh_ndk_1opencv_MainActivity_grayP(JNIEnv *env, jclass type, jintArray 
 //    __android_log_print(ANDROID_LOG_ERROR, "动态地址计算--操作像素所用时长：", "%lf", time);//0.609992
 
 
+//    /**
+//     * 亮度和对比度--操作像素
+//     */
+//    uchar *ptr = imgData.ptr(0);
+//
+//    //获取当前的CPU钟摆时间
+//    double time = static_cast<double >(getTickCount());
+//    int a = 4;  //对比度
+//    int b = 50; //亮度
+//    //中间是运行过程
+//    for (int i = 0; i < w * h; ++i) {
+//        /**
+//         * 灰度值计算公式  像素灰度值 = R*0.3+ G*0.59 + B*0.11
+//         * 从RGB转Y（亮度）UV得出来的
+//         * 矩阵的第一行就是一个灰度值
+//         */
+//        //把灰度注释掉
+////        uchar gray = (uchar) (ptr[4 * i + 2] * 0.299 + ptr[4 * i + 1] * 0.587 +
+////                              ptr[4 * i + 0] * 0.114);
+//        //对每一个像素针对性的处理,容易越界
+////        ptr[4 * i + 0] = (ptr[4 * i + 0] + b) > 255 ? 255 : ptr[4 * i + 0] + b;
+////        ptr[4 * i + 1] = (ptr[4 * i + 1] + b) > 255 ? 255 : ptr[4 * i + 0] + b;
+////        ptr[4 * i + 2] = (ptr[4 * i + 2] + b) > 255 ? 255 : ptr[4 * i + 0] + b;
+//
+////        //亮度
+//        //*********是saturate_cast，不是static_cast**********
+//        ptr[4 * i + 0] = saturate_cast<uchar>( ptr[4 * i + 0] + b);
+//        ptr[4 * i + 1] = saturate_cast<uchar>( ptr[4 * i + 1] + b);
+//        ptr[4 * i + 2] = saturate_cast<uchar>( ptr[4 * i + 2] + b);
+//
+////        //对比度
+////        ptr[4 * i + 0] = saturate_cast<uchar>( ptr[4 * i + 0] * a);
+////        ptr[4 * i + 1] = saturate_cast<uchar>( ptr[4 * i + 1] * a);
+////        ptr[4 * i + 2] = saturate_cast<uchar>( ptr[4 * i + 2] * a);
+//
+//    }
+//
+//    //计算运行时间
+//    time = ((double) getTickCount() - time) / getTickFrequency();
+//    __android_log_print(ANDROID_LOG_ERROR, "亮度和对比度--操作像素所用时长", "%lf", time);//0.102784
+
+
     /**
-     * 亮度和对比度--操作像素
+     * 颜色通道的分离与合并
      */
-    uchar *ptr = imgData.ptr(0);
+    Mat img(h, w, CV_8UC4, (unsigned char *) pixels);
 
-    //获取当前的CPU钟摆时间
-    double time = static_cast<double >(getTickCount());
-    int a = 4;  //对比度
-    int b = 50; //亮度
-    //中间是运行过程
-    for (int i = 0; i < w * h; ++i) {
-        /**
-         * 灰度值计算公式  像素灰度值 = R*0.3+ G*0.59 + B*0.11
-         * 从RGB转Y（亮度）UV得出来的
-         * 矩阵的第一行就是一个灰度值
-         */
-        //把灰度注释掉
-//        uchar gray = (uchar) (ptr[4 * i + 2] * 0.299 + ptr[4 * i + 1] * 0.587 +
-//                              ptr[4 * i + 0] * 0.114);
-        //对每一个像素针对性的处理,容易越界
-//        ptr[4 * i + 0] = (ptr[4 * i + 0] + b) > 255 ? 255 : ptr[4 * i + 0] + b;
-//        ptr[4 * i + 1] = (ptr[4 * i + 1] + b) > 255 ? 255 : ptr[4 * i + 0] + b;
-//        ptr[4 * i + 2] = (ptr[4 * i + 2] + b) > 255 ? 255 : ptr[4 * i + 0] + b;
+    vector<Mat> outimgs;
+    //分离
+    split(imgData, outimgs);
+    //代表第一个通道
+    Mat out1;
+    out1 = outimgs.at(0);
 
-//        //亮度
-        //*********是saturate_cast，不是static_cast**********
-        ptr[4 * i + 0] = saturate_cast<uchar>( ptr[4 * i + 0] + b);
-        ptr[4 * i + 1] = saturate_cast<uchar>( ptr[4 * i + 1] + b);
-        ptr[4 * i + 2] = saturate_cast<uchar>( ptr[4 * i + 2] + b);
+    //合并
+    //把outimgs进行操作之后，还原到imgData中，或者新建一个Mat img参数和imgData一样
+    merge(outimgs,img);
 
-//        //对比度
-//        ptr[4 * i + 0] = saturate_cast<uchar>( ptr[4 * i + 0] * a);
-//        ptr[4 * i + 1] = saturate_cast<uchar>( ptr[4 * i + 1] * a);
-//        ptr[4 * i + 2] = saturate_cast<uchar>( ptr[4 * i + 2] * a);
+    /**
+     * 颜色空间的转换
+     */
+    cvtColor(img,img,CV_BGRA2GRAY);//OpenCV2中的写法，直接将图片变成了一个灰度图，但是通道会变，运行会报错，只是中间操作
+    cvtColor(img,img,COLOR_BGRA2GRAY);//OpenCV3中的写法
 
-    }
-
-    //计算运行时间
-    time = ((double) getTickCount() - time) / getTickFrequency();
-    __android_log_print(ANDROID_LOG_ERROR, "亮度和对比度--操作像素所用时长", "%lf", time);//0.102784
 
     //腐蚀效果
 //    Mat ppt = getStructuringElement(MORPH_RECT,Size(50,50));
