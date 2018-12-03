@@ -152,27 +152,71 @@ Java_com_dhh_ndk_1opencv_MainActivity_grayP(JNIEnv *env, jclass type, jintArray 
 //    __android_log_print(ANDROID_LOG_ERROR, "亮度和对比度--操作像素所用时长", "%lf", time);//0.102784
 
 
+//    /**
+//     * 颜色通道的分离与合并
+//     */
+//    Mat img(h, w, CV_8UC4, (unsigned char *) pixels);
+//
+//    vector<Mat> outimgs;
+//    //分离
+//    split(imgData, outimgs);
+//    //代表第一个通道
+//    Mat out1;
+//    out1 = outimgs.at(0);
+//
+//    //合并
+//    //把outimgs进行操作之后，还原到imgData中，或者新建一个Mat img参数和imgData一样
+//    merge(outimgs,img);
+
+//    /**
+//     * 颜色空间的转换
+//     */
+//    cvtColor(img,img,CV_BGRA2GRAY);//OpenCV2中的写法，直接将图片变成了一个灰度图，但是通道会变，运行会报错，只是中间操作
+//    cvtColor(img,img,COLOR_BGRA2GRAY);//OpenCV3中的写法
+
     /**
-     * 颜色通道的分离与合并
+     * 滤波
      */
     Mat img(h, w, CV_8UC4, (unsigned char *) pixels);
 
-    vector<Mat> outimgs;
-    //分离
-    split(imgData, outimgs);
-    //代表第一个通道
-    Mat out1;
-    out1 = outimgs.at(0);
+    /**
+     * 方框滤波：用方框滤波器模糊一张图片
+     * boxFilter( InputArray src输入图片, OutputArray dst输出图片, int ddepth（输出图像的深度-1时代表使用原图深度）,
+                             Size ksize核的大小, Point anchor锚点（被处理掉的那个点） = Point(-1,-1)核的默认值，表示核的中心点,
+                             bool normalize = true表示内核是否被区域归一化,
+                             int borderType = BORDER_DEFAULT 边界值，一般不对其改变)
+     */
+    //其他参数都使用默认值
+//    boxFilter(img,img,-1,Size(50,50));
 
-    //合并
-    //把outimgs进行操作之后，还原到imgData中，或者新建一个Mat img参数和imgData一样
-    merge(outimgs,img);
+//    /**
+//     * 均值滤波：去燥（缺陷：不能保护图像细节，不可避免的会模糊）
+//     * blur( InputArray src, OutputArray dst,
+//                        Size ksize, Point anchor = Point(-1,-1),
+//                        int borderType = BORDER_DEFAULT )
+//     * src 输入：有要求格式
+//     * dst 输出：要求和原图片有一样的尺寸和类型
+//     * ksize 核: 值比较小的时候属于高通，有锐化的效果
+//     * borderType 边界值
+//     * /
+//    blur(img,img,Size(15,15));
 
     /**
-     * 颜色空间的转换
+     * 高斯滤波
+     * GaussianBlur( InputArray src, OutputArray dst, Size ksize,
+                                double sigmaX, double sigmaY = 0,
+                                int borderType = BORDER_DEFAULT )
+     * src 输入：有要求格式
+     * dst 输出：要求和原图片有一样的尺寸和类型
+     * ksize：宽度和高度数值必须为正数和奇数，或者都是0
+     * sigmaX：当前的高斯核函数在X轴上的一个标准偏差
+     * sigmaY：当前的高斯核函数在Y轴上的一个标准偏差，
+     *         如果y=0,也就是让x也等于0，就要根据ksize中的值进行计算
+     *         如果y有值，x也有值，就把ksize中的值都设置为0，让它自行去运算
+     * borderType：
      */
-    cvtColor(img,img,CV_BGRA2GRAY);//OpenCV2中的写法，直接将图片变成了一个灰度图，但是通道会变，运行会报错，只是中间操作
-    cvtColor(img,img,COLOR_BGRA2GRAY);//OpenCV3中的写法
+    GaussianBlur(img,img,Size(55,55),0);
+
 
 
     //腐蚀效果
